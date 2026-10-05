@@ -1,7 +1,7 @@
 === Simply Umami ===
-Contributors: ashrafali, ancocodet
+Contributors: nerveband, ancocodet
 Tags: analytics, umami, privacy, statistics
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 Requires at least: 6.0
 Tested up to: 7.1
 Requires PHP: 7.4
@@ -89,10 +89,16 @@ The obsolete data-cache tracker option was removed. It does not control the plug
 
 == Screenshots ==
 
-1. Simply Umami setup and optional integration sections, using a local synthetic test site.
-2. Recorder opt-in, server requirements, and sensitive-data warnings.
+1. Tracking setup, saved configuration status, and keyboard-accessible optional sections on a synthetic test site.
+2. Recorder opt-in, server requirements, and sensitive-data warnings in the redesigned settings page.
 
 == Changelog ==
+
+= 1.1.1 =
+* Simplify settings layout, field labels, privacy warnings, and save guidance.
+* Replace hidden-checkbox accordions with native keyboard-accessible disclosure controls.
+* Add a local flat icon and responsive, plugin-scoped admin styles.
+* Preserve existing saved options and tracking behavior.
 
 = 1.1.0 =
 * Add opt-in heatmap/session replay recorder.js loading and a custom recorder URL.

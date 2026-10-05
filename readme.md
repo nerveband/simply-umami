@@ -1,8 +1,12 @@
 # Simply Umami
 
+![Simply Umami: Umami Analytics for WordPress, self-hosted or Cloud.](.wordpress-org/banner-1544x500.png)
+
 WordPress integration for self-hosted Umami Analytics and Umami Cloud. Based on [Integrate Umami by Ancocodet](https://github.com/Ancocodet/wp-umami), licensed GPLv3 or later.
 
-Version: **1.1.0**. Requires WordPress 6.0+ and PHP 7.4+. The release smoke used WordPress 7.1.2 and a real Umami v3.4.0 server.
+Version: **1.1.1**. Requires WordPress 6.0+ and PHP 7.4+. Tracking in 1.1.0 was verified with WordPress 7.1.2 and a real Umami v3.4.0 server; 1.1.1 changes the settings presentation, not collection.
+
+Submitted to WordPress.org on October 5, 2026 as `nerveband`. The automated scan passed; manual review is pending. The provisional slug is `simply-umami`. Afiyah runs the submitted 1.1.1 ZIP with its existing tracking settings and recording disabled.
 
 ## Setup
 
@@ -14,6 +18,19 @@ Version: **1.1.0**. Requires WordPress 6.0+ and PHP 7.4+. The release smoke used
 6. Test as an anonymous visitor. Administrators are excluded by default.
 
 API access is optional. Self-hosted instances use a username and password; Umami Cloud uses an API key and `https://api.umami.is/v1`. Tracking works without dashboard API credentials.
+
+## Settings
+
+The settings page separates tracking setup, privacy controls, recording, and dashboard API access. These screenshots use synthetic configuration.
+
+![Tracking setup, saved configuration status, and optional settings sections.](.wordpress-org/screenshot-1.png)
+
+<details>
+<summary>Recorder settings and privacy warning</summary>
+
+![Separate recorder opt-in, server requirements, and sensitive-data warning.](.wordpress-org/screenshot-2.png)
+
+</details>
 
 ## Website-side feature coverage
 
@@ -75,6 +92,10 @@ add_filter( 'simply_umami_recorder_enabled', function ( $enabled, $options ) {
 
 Server-side filters do not replace a browser consent manager. Ensure page caches do not defeat any consent-dependent decisions.
 
+## Changes in 1.1.1
+
+The settings page uses WordPress-styled fields, native keyboard-accessible disclosure controls, and a local icon. “Tracking configured” describes saved settings; it does not confirm collection. Tracking options, storage, nonce handling, and recorder opt-in are unchanged. The admin icon and directory graphics use the same bowl-and-data-point mark.
+
 ## Changes in 1.1.0
 
 * Add opt-in heatmap/session replay support and configurable recorder URL.
@@ -109,6 +130,26 @@ For a production package, run `composer install --no-dev --optimize-autoloader` 
 
 ## WordPress.org release
 
-Submit a complete ZIP at [Add your plugin](https://wordpress.org/plugins/developers/add/), using the intended owner account. Directory review and slug approval happen before SVN publication. Do not deploy to `integrate-umami`: that is the upstream plugin.
+WordPress.org accepted the submitted 1.1.1 ZIP for manual review under the provisional slug `simply-umami`. Check review status through [Add your plugin](https://wordpress.org/plugins/developers/add/) using the owner account.
+
+Submitted ZIP SHA-256:
+
+```text
+d07c1350412a8f85c3c1b6cea809ac031526d1389ab163d67ab05ee8af09b169
+```
+
+Directory approval must come before SVN publication. Do not deploy to `integrate-umami`, the upstream plugin's slug.
 
 The workflows use `simply-umami` and gate directory publication on the repository variable `WORDPRESS_ORG_APPROVED=true`. Set that variable and SVN credentials only after approval and confirmation of the assigned slug. GitHub packaging and releases work independently of directory approval.
+
+The README, hosted review, and admin header use the approved artwork. The source files are in `.wordpress-org/`; `css/icon.png` is identical to the 128-pixel directory icon. The artwork concept came from GPT Image Sub's ChatGPT subscription route and was redrawn locally for the final exports.
+
+| Asset | Files |
+|---|---|
+| Plugin icon | [128×128](.wordpress-org/icon-128x128.png), [256×256](.wordpress-org/icon-256x256.png) |
+| Directory banner | [772×250](.wordpress-org/banner-772x250.png), [1544×500](.wordpress-org/banner-1544x500.png) |
+| Settings screenshots | [Tracking setup](.wordpress-org/screenshot-1.png), [Recorder settings](.wordpress-org/screenshot-2.png) |
+
+The [hosted design review](https://share.wavedepth.com/simply-umami-design-review/) uses content-hashed image paths and ZIP filenames so updates do not reuse stale cached assets. Keep the canonical WordPress.org filenames in `.wordpress-org/` and the graphics ZIP; fingerprinting applies only to the hosted review.
+
+After approval, publish graphics to the top-level SVN `assets/` directory, outside `trunk/` and the installable plugin ZIP. Follow the [official asset filenames, dimensions, and file-size limits](https://developer.wordpress.org/plugins/wordpress-org/plugin-assets/). Keep directory deployment disabled until approval and confirmation of the assigned slug.

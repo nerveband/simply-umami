@@ -173,7 +173,25 @@ class Settings {
 		//phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		?>
 			<div class="wrap" id="simply-umami">
-				<h1><?php echo esc_html__( 'Simply Umami Settings', 'simply-umami' ); ?></h1>
+				<header class="simply-umami-header">
+					<img src="<?php echo esc_url( plugins_url( 'css/icon.png', SIMPLY_UMAMI_BASE_FILE ) ); ?>" alt="" width="48" height="48" />
+					<div>
+						<h1><?php esc_html_e( 'Simply Umami', 'simply-umami' ); ?></h1>
+						<p><?php esc_html_e( 'Tracking and dashboard settings', 'simply-umami' ); ?></p>
+					</div>
+					<span class="simply-umami-status">
+						<?php
+						if ( ! $options['enabled'] ) {
+							esc_html_e( 'Tracking off', 'simply-umami' );
+						} elseif ( empty( $options['script_url'] ) || empty( $options['website_id'] ) ) {
+							esc_html_e( 'Setup incomplete', 'simply-umami' );
+						} else {
+							esc_html_e( 'Tracking configured', 'simply-umami' );
+						}
+						?>
+					</span>
+				</header>
+				<hr class="wp-header-end" />
 				<?php include 'templates/settings-page.php'; ?>
 			</div>
 		<?php

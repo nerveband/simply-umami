@@ -1,40 +1,39 @@
-.simply-umami-url {
-    width: 500px;
-}
-
-.simply-umami-text {
-    width: 500px;
-}
-
-.simply-umami-collapsed {
-    padding: 10px;
-    border: solid 1px #8c8f94;
-    border-radius: 4px;
-    background-color: rgba(245, 245, 245, 0.96);
-}
-
-.simply-umami-collapsed .toggle, .simply-umami-collapsed .content {
-    display: none;
-}
-
-.simply-umami-collapsed .toggle-label::after {
-    display: block; content: "\2BC6";
-    position: absolute; right: 10px; top: 3px;
-    transition: all 0.4s;
-}
-
-.simply-umami-collapsed .toggle:checked ~ .content {
-    padding: 10px;
-    display: block;
-}
-
-.simply-umami-collapsed .toggle:checked ~ .toggle-label:after {
-    content: "\2BC5";
-}
-
-.simply-umami-collapsed .toggle-label {
-    display: block;
-    font-weight: bold;
-    font-size: 16px;
-    position: relative;
+#simply-umami { max-width: 1040px; color: #1d2327; }
+#simply-umami .simply-umami-header { display: flex; align-items: center; gap: 16px; padding: 20px 0 24px; }
+#simply-umami .simply-umami-header img { border-radius: 8px; flex-shrink: 0; }
+#simply-umami .simply-umami-header h1 { padding: 0; font-size: 25px; font-weight: 600; line-height: 1.3; }
+#simply-umami .simply-umami-header p { margin: 4px 0 0; color: #50575e; }
+#simply-umami .simply-umami-status { margin-inline-start: auto; padding: 6px 10px; border: 1px solid #c3c4c7; border-radius: 4px; font-size: 12px; background: #fff; white-space: nowrap; }
+#simply-umami .simply-umami-form { background: #fff; border: 1px solid #c3c4c7; border-radius: 6px; overflow: hidden; }
+#simply-umami .simply-umami-setup { padding: 28px 32px; }
+#simply-umami h2 { margin: 0 0 8px; font-size: 19px; line-height: 1.4; }
+#simply-umami .simply-umami-intro { max-width: 66ch; margin: 0 0 24px; font-size: 14px; color: #50575e; line-height: 1.6; }
+#simply-umami .form-table { margin: 0; }
+#simply-umami .form-table th { width: 180px; padding: 16px 20px 16px 0; font-weight: 600; }
+#simply-umami .form-table td { padding: 12px 0; }
+#simply-umami .simply-umami-url, #simply-umami .simply-umami-text { width: 100%; max-width: 560px; min-height: 40px; }
+#simply-umami select { min-height: 40px; }
+#simply-umami .description { max-width: 66ch; margin-top: 8px; color: #50575e; font-size: 13px; line-height: 1.6; }
+#simply-umami .form-table label { line-height: 1.6; }
+#simply-umami .simply-umami-section { border-top: 1px solid #dcdcde; }
+#simply-umami summary { padding: 20px 32px; cursor: pointer; font-size: 15px; font-weight: 600; }
+#simply-umami summary::marker { color: #50575e; }
+#simply-umami summary:hover { background: #f6f7f7; }
+#simply-umami summary:focus-visible { outline: 2px solid #2271b1; outline-offset: -3px; }
+#simply-umami .simply-umami-summary-note { display: inline-block; margin-inline-start: 16px; color: #50575e; font-weight: 400; font-size: 13px; }
+#simply-umami .simply-umami-section-body { padding: 4px 32px 24px; }
+#simply-umami .simply-umami-warning { border-inline-start: 3px solid #996800; background: #fcf9ee; padding: 12px 16px; font-size: 13px; line-height: 1.7; color: #3c434a; }
+#simply-umami .simply-umami-save { border-top: 1px solid #dcdcde; background: #f6f7f7; padding: 20px 32px; display: flex; align-items: center; gap: 24px; }
+#simply-umami .simply-umami-save .submit { padding: 0; margin: 0; flex-shrink: 0; }
+#simply-umami .simply-umami-save .button { min-height: 40px; padding: 4px 18px; }
+#simply-umami .simply-umami-save > p { margin: 0; font-size: 12px; color: #50575e; max-width: 65ch; }
+@media (max-width: 782px) {
+    #simply-umami .simply-umami-header { flex-wrap: wrap; }
+    #simply-umami .simply-umami-status { margin-inline-start: 64px; }
+    #simply-umami .simply-umami-setup, #simply-umami .simply-umami-section-body { padding: 20px; }
+    #simply-umami summary { padding: 20px; }
+    #simply-umami .simply-umami-summary-note { display: block; margin: 6px 0 0 16px; }
+    #simply-umami .form-table th { width: auto; padding: 16px 0 4px; }
+    #simply-umami .form-table td { padding: 8px 0 16px; }
+    #simply-umami .simply-umami-save { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; }
 }
