@@ -1,6 +1,6 @@
 {
-  "name": "integrate-umami",
-  "version": "1.0.0",
+  "name": "simply-umami",
+  "version": "1.1.0",
   "scripts": {
     "test": "playwright test",
     "start": "wp-env start",
@@ -9,7 +9,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "GPL-3.0-or-later",
   "devDependencies": {
     "@playwright/test": "^1.56.1",
     "@types/node": "^20.11.17",

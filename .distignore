@@ -2,8 +2,7 @@
 /.git
 /.github
 
-wp-umami.zip
-integrate-umami.zip
+simply-umami.zip
 
 .distignore
 .gitignore
@@ -13,3 +12,9 @@ integrate-umami.zip
 playwright.config.js
 package-lock.json
 package.json
+/tests
+/test-results
+.wp-env.json
+phpcs.xml
+.cz.json
+.gitattributes

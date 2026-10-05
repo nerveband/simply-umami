@@ -1,8 +1,8 @@
 {
-    "name": "ancozockt/integrate-umami",
+    "name": "nerveband/simply-umami",
     "description": "Wordpress Umami Analytics Integration",
     "type": "wordpress-plugin",
-    "license": "GPL-2.0-or-later",
+    "license": "GPL-3.0-or-later",
     "authors": [
         {
             "name": "Ancozockt",
@@ -29,12 +29,6 @@
         }
     },
     "scripts": {
-        "install-codestandards": [
-            "PHPCSStandards\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run"
-        ],
-        "post-install-cmd": [
-            "@install-codestandards"
-        ],
         "php:lint": "./vendor/bin/phpcs . -s",
         "php:lint-fix": "./vendor/bin/phpcbf ."
     }

@@ -1,109 +1,98 @@
-const {test, expect} = require('@playwright/test')
-const {updateOption, getOption, runCommand} = require("./helper/wpcli-command");
-const TEST_USER = process.env.TEST_USER || 'admin'
-const TEST_PASS = process.env.TEST_PASS || 'password'
-
-test.describe('settings page', () => {
-    test('enable analytics', async ({page}) => {
-        await login(page);
-        await switchToSettings(page);
-
-        await page.locator('#integrate_umami_enabled').check();
-        await page.locator('#integrate_umami_script_url').fill('https://umami.example.com/umami.js')
-        await page.locator('#integrate_umami_website_id').fill('12345678')
-        await page.getByRole('button', {name: 'Save Changes'}).click();
-
-        await logout(page);
-        await page.goto('/', {waitUntil: 'networkidle'});
-
-        let script = await page.locator("script[src='https://umami.example.com/umami.js']");
-        await expect(script).toHaveAttribute('async');
-        await expect(script).toHaveAttribute('defer');
-        await expect(script).toHaveAttribute('data-website-id', '12345678');
-        await expect(script).toHaveAttribute('data-do-not-track', 'true');
-    });
-
-    test('disable analytics', async ({page}) => {
-        await login(page);
-        await switchToSettings(page);
-
-        await page.locator('#integrate_umami_enabled').check();
-        await page.getByRole('button', {name: 'Save Changes'}).click();
-
-        await logout(page);
-        await page.goto('/', {waitUntil: 'networkidle'});
-
-        !page.locator("script[src='https://umami.example.com/umami.js']")
-    });
-
-    test('migrate from old settings', async ({page}) => {
-        const oldOptions = {
-            enabled: 1,
-            script_url: 'https://umami.example.com/umami.js',
-            website_id: '12345678',
-            do_not_track: 1,
-            auto_track: 1,
-            cache: 0,
-            track_comments: 0,
-            ignore_admins: 1,
-            use_host_url: 0,
-            host_url: '',
-
-        }
-        const jsonOptions = JSON.stringify(oldOptions);
-
-        runCommand(`option update umami_options ${jsonOptions} --format=json --quiet`);
-        runCommand(`option delete integrate_umami_options --quiet`);
-
-        await login(page);
-        await switchToSettings(page);
-
-        let value;
-        try{
-            value = runCommand('option get integrate_umami_options --format=json --quiet').toString();
-        } catch (e) { }
-
-        let jsonValue = JSON.parse(value);
-        expect(jsonValue).toEqual(oldOptions);
-
-        let testValue;
-        try {
-            testValue = runCommand('option get umami_options --format=json --quiet').toString();
-        } catch (e) { }
-        expect(testValue).toEqual(undefined)
-    });
+const { test, expect } = require('@playwright/test');
+const { runCommand } = require('./helper/wpcli-command');
+const configured = {
+    enabled: 1,
+    script_url: 'https://umami.example.com/script.js',
+    website_id: 'e676c9b4-11e4-4ef1-a4d7-87001773e9f2',
+    host_url: 'https://collect.example.com/base?x=1&y=2',
+    use_host_url: 1,
+    ignore_admins: 1,
+    auto_track: 0,
+    do_not_track: 1,
+    track_comments: 0,
+};
+function setOptions(options) {
+    runCommand(`option update simply_umami_options ${JSON.stringify(options)} --format=json --quiet`);
+}
+async function login(page) {
+    await page.goto('/wp-login.php');
+    await page.fill('#user_login', process.env.TEST_USER || 'admin');
+    await page.fill('#user_pass', process.env.TEST_PASS || 'password');
+    await page.click('#wp-submit');
+    await page.waitForURL(/wp-admin/);
+}
+test.beforeEach(() => setOptions(configured));
+test('collection URL and tracking controls survive HTML parsing', async ({ page }) => {
+    await page.goto('/');
+    const script = page.locator('script[data-website-id]');
+    await expect(script).toHaveAttribute('data-website-id', configured.website_id);
+    await expect(script).toHaveAttribute('data-auto-track', 'false');
+    await expect(script).toHaveAttribute('data-do-not-track', 'true');
+    await expect(script).toHaveAttribute('data-host-url', configured.host_url);
+});
+test('disabled tracking emits no tracker', async ({ page }) => {
+    setOptions({ ...configured, enabled: 0 });
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveCount(0);
+});
+test('administrator exclusion does not exclude anonymous visitors', async ({ page }) => {
+    await login(page);
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveCount(0);
+    await page.context().clearCookies();
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveAttribute('data-website-id', configured.website_id);
+});
+test('deactivation and reactivation retain configured tracking', async ({ page }) => {
+    runCommand('plugin deactivate simply-umami --quiet');
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveCount(0);
+    runCommand('plugin activate simply-umami --quiet');
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveAttribute('data-website-id', configured.website_id);
+});
+test('legacy migration does not overwrite subsequently saved settings', async ({ page }) => {
+    runCommand(`option update integrate_umami_options ${JSON.stringify(configured)} --format=json --quiet`);
+    runCommand('option delete simply_umami_options --quiet');
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveAttribute('data-website-id', configured.website_id);
+    setOptions({ ...configured, website_id: 'b59e9c65-ae32-47f1-8400-119fcf4861c4' });
+    await page.goto('/');
+    await expect(page.locator('script[data-website-id]')).toHaveAttribute('data-website-id', 'b59e9c65-ae32-47f1-8400-119fcf4861c4');
 });
 
-async function login(page) {
-    await page.goto('/wp-login.php', {waitUntil: 'networkidle'})
-    await expect(page).toHaveTitle(/Log In/)
+test('recording opt-in preserves ports and paths without inheriting tracker query or fragment', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('#simply-umami-recorder-js')).toHaveCount(0);
+    setOptions({
+        ...configured,
+        script_url: 'https://umami.example.com:8443/assets/script.js?proxy=https://other.example.com/path#fragment',
+        recorder_enabled: 1,
+    });
+    await page.goto('/');
+    await expect(page.locator('#simply-umami-recorder-js')).toHaveAttribute('src', 'https://umami.example.com:8443/assets/recorder.js');
+});
 
-    /** initiate login process */
-    await page.fill('#user_login', TEST_USER)
-    await page.fill('#user_pass', TEST_PASS)
-    await page.click('#wp-submit')
+test('tracking disabled or administrator exclusion also prevents recorder loading', async ({ page }) => {
+    setOptions({ ...configured, recorder_enabled: 1, enabled: 0 });
+    await page.goto('/');
+    await expect(page.locator('#simply-umami-recorder-js')).toHaveCount(0);
+    setOptions({ ...configured, recorder_enabled: 1 });
+    await login(page);
+    await page.goto('/');
+    await expect(page.locator('#simply-umami-recorder-js')).toHaveCount(0);
+});
 
-    /** correct redirect to dashboard */
-    await page.waitForLoadState('networkidle')
-    await expect(page).toHaveTitle(/Dashboard/)
-}
-
-async function logout(page) {
-    await page.context().clearCookies();
-}
-
-async function switchToSettings(page) {
-    const menu = await page.locator('.wp-menu-name').getByText('Settings')
-    await expect(menu).toBeVisible();
-    await menu.click()
-    await page.waitForLoadState('networkidle')
-    await expect(page).toHaveTitle(/General Settings/)
-
-    const settings = await page.locator('a').getByText('Integrate Umami')
-    await expect(settings).toBeVisible();
-    await settings.click()
-    await page.waitForLoadState('networkidle')
-
-    const title = await page.locator('h1').getByText('Integrate Umami Settings')
-    await expect(title).toBeVisible()
-}
+test('dashboard link preserves a custom port and application base path', async ({ page }) => {
+    setOptions({
+        ...configured,
+        script_url: 'https://umami.example.com:8443/analytics/script.js?version=3#fragment',
+        host_url: '',
+        use_host_url: 0,
+    });
+    await login(page);
+    await page.goto('/wp-admin/');
+    await expect(page.locator('#umami_widget a')).toHaveAttribute(
+        'href', `https://umami.example.com:8443/analytics/websites/${configured.website_id}`
+    );
+});
